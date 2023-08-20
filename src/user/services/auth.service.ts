@@ -1,9 +1,4 @@
-import {
-	BadRequestException,
-	Injectable,
-	NotFoundException,
-	UnauthorizedException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { LoginDto, RegisterDto, VerifyDto } from '../dto/auth.dto';
 import { PrismaClient, StatusUser, User } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
@@ -49,7 +44,7 @@ export class AuthService {
 			},
 		});
 
-		const user = await prisma.user.create({
+		return prisma.user.create({
 			data: {
 				email: dto.email,
 				password: dto.password,
@@ -57,8 +52,6 @@ export class AuthService {
 				verifiyCode: verifyCode,
 			},
 		});
-
-		return user;
 	}
 
 	async verifyUser(dto: VerifyDto): Promise<TokenResponse> {

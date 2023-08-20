@@ -2,11 +2,11 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, {
-    logger: ['log', 'debug'],
-  });
+	const app = await NestFactory.create(AppModule, {
+		logger: ['log', 'debug'],
+	});
 
-  app.setGlobalPrefix('api');
-  await app.listen(3000);
+	app.setGlobalPrefix('api');
+	await app.listen(3000);
 }
-bootstrap();
+bootstrap().then(() => console.log(`Server running on port 3000`));
