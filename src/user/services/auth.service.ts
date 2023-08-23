@@ -1,18 +1,22 @@
-import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import {
+	BadRequestException,
+	Injectable,
+	NotFoundException,
+	UnauthorizedException,
+} from '@nestjs/common';
 import { LoginDto, RegisterDto, VerifyDto } from '../dto/auth.dto';
 import { PrismaClient, StatusUser, User } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { generateVerifyCode } from '../../utils';
 import { MailerService } from '@nestjs-modules/mailer';
-import * as process from 'process';
 
 const prisma = new PrismaClient();
 
 type TokenResponse = {
 	email: string;
+	identifierId: string;
 	accessToken: string;
-	refreshToken: string;
 };
 
 @Injectable()
@@ -24,7 +28,13 @@ export class AuthService {
 
 	async registerUser(dto: RegisterDto): Promise<User> {
 		const existUser = await prisma.user.findFirst({
-			where: { OR: [{ email: dto.email }, { username: dto.username }] },
+			where: {
+				OR: [
+					{ email: dto.email },
+					{ username: dto.username },
+					{ identifierID: dto.identifierId },
+				],
+			},
 		});
 
 		if (existUser) {
@@ -72,7 +82,10 @@ export class AuthService {
 			data: { status: StatusUser.ACTIVE },
 		});
 
-		return await this.generateToken({ email: dto.email });
+		return await this.generateToken({
+			email: dto.email,
+			identifierId: existUser.identifierID,
+		});
 	}
 
 	async loginUser(dto: LoginDto): Promise<TokenResponse> {
@@ -102,28 +115,22 @@ export class AuthService {
 			throw new UnauthorizedException("User hasn't been verified yet");
 		}
 
-		return await this.generateToken({ email: user.email });
+		return await this.generateToken({
+			email: user.email,
+			identifierId: user.identifierID,
+		});
 	}
 
-	private async generateToken({ email }): Promise<TokenResponse> {
+	private async generateToken({
+		email,
+		identifierId,
+	}): Promise<TokenResponse> {
 		const accessToken = await this.jwtService.signAsync({ email });
-		const refreshToken = await this.jwtService.signAsync(
-			{ email },
-			{
-				secret: process.env.JWT_SECRET_KEY,
-				expiresIn: process.env.JWT_EXPIRES_REFRESH,
-			},
-		);
-
-		await prisma.user.update({
-			where: { email },
-			data: { refreshToken: refreshToken },
-		});
 
 		return {
 			email,
+			identifierId,
 			accessToken,
-			refreshToken,
 		};
 	}
 }

@@ -21,7 +21,7 @@ model User {
   email        String     @unique
   username     String?
   password     String
-  refreshToken String?
+  identifierID String?    @unique
   verifiyCode  String?
   status       StatusUser @default(PENDING)
   createdAt    DateTime   @default(now())

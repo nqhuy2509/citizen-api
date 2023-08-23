@@ -10,6 +10,9 @@ export class RegisterDto {
 	@IsNotEmpty()
 	@IsEmail()
 	email: string;
+
+	@IsNotEmpty()
+	identifierId: string;
 }
 
 export class VerifyDto {
