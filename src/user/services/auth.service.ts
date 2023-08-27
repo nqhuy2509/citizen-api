@@ -5,17 +5,16 @@ import {
 	UnauthorizedException,
 } from '@nestjs/common';
 import { LoginDto, RegisterDto, VerifyDto } from '../dto/auth.dto';
-import { PrismaClient, StatusUser, User } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { generateVerifyCode } from '../../utils';
 import { MailerService } from '@nestjs-modules/mailer';
-
-const prisma = new PrismaClient();
+import { User } from '../../entities/user.entity';
+import { UserRepository } from '../../repositories/user.repository';
+import { StatusUser } from '../../enums/statusUser';
 
 type TokenResponse = {
 	email: string;
-	identifierId: string;
 	accessToken: string;
 };
 
@@ -24,18 +23,14 @@ export class AuthService {
 	constructor(
 		private readonly jwtService: JwtService,
 		private readonly mailerService: MailerService,
+		private readonly userRepository: UserRepository,
 	) {}
 
 	async registerUser(dto: RegisterDto): Promise<User> {
-		const existUser = await prisma.user.findFirst({
-			where: {
-				OR: [
-					{ email: dto.email },
-					{ username: dto.username },
-					{ identifierID: dto.identifierId },
-				],
-			},
-		});
+		const existUser = await this.userRepository.findUnique(
+			dto.email,
+			dto.citizenId,
+		);
 
 		if (existUser) {
 			throw new BadRequestException('User already exists');
@@ -54,53 +49,37 @@ export class AuthService {
 			},
 		});
 
-		return prisma.user.create({
-			data: {
-				email: dto.email,
-				password: dto.password,
-				username: dto.username,
-				verifiyCode: verifyCode,
-			},
-		});
+		const user = new User();
+		user.email = dto.email;
+		user.password = dto.password;
+		user.verifyCode = verifyCode;
+
+		return await this.userRepository.create(user);
 	}
 
 	async verifyUser(dto: VerifyDto): Promise<TokenResponse> {
-		const existUser = await prisma.user.findUnique({
-			where: { email: dto.email },
-		});
+		const existUser = await this.userRepository.findByEmail(dto.email);
 
 		if (!existUser) {
 			throw new NotFoundException('User not found');
 		}
 
-		if (dto.code !== existUser.verifiyCode) {
+		if (dto.code !== existUser.verifyCode) {
 			throw new BadRequestException('Invalid verify code');
 		}
 
-		await prisma.user.update({
-			where: { email: dto.email },
-			data: { status: StatusUser.ACTIVE },
-		});
+		await this.userRepository.updateStatusUser(
+			existUser.id,
+			StatusUser.VERIFIED,
+		);
 
 		return await this.generateToken({
 			email: dto.email,
-			identifierId: existUser.identifierID,
 		});
 	}
 
 	async loginUser(dto: LoginDto): Promise<TokenResponse> {
-		const user = await prisma.user.findFirst({
-			where: {
-				OR: [
-					{
-						email: dto.email,
-					},
-					{
-						username: dto.email,
-					},
-				],
-			},
-		});
+		const user = await this.userRepository.findByEmail(dto.email);
 
 		if (!user) {
 			throw new BadRequestException('Invalid Credential');
@@ -117,19 +96,14 @@ export class AuthService {
 
 		return await this.generateToken({
 			email: user.email,
-			identifierId: user.identifierID,
 		});
 	}
 
-	private async generateToken({
-		email,
-		identifierId,
-	}): Promise<TokenResponse> {
+	private async generateToken({ email }): Promise<TokenResponse> {
 		const accessToken = await this.jwtService.signAsync({ email });
 
 		return {
 			email,
-			identifierId,
 			accessToken,
 		};
 	}

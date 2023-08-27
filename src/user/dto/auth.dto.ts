@@ -12,7 +12,7 @@ export class RegisterDto {
 	email: string;
 
 	@IsNotEmpty()
-	identifierId: string;
+	citizenId: string;
 }
 
 export class VerifyDto {

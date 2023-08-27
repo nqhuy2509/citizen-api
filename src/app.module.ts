@@ -5,10 +5,24 @@ import { UserModule } from './user/user.module';
 import { ConfigModule } from '@nestjs/config';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
 	imports: [
 		ConfigModule.forRoot({ isGlobal: true }),
+		TypeOrmModule.forRoot({
+			type: 'postgres',
+			host: 'localhost',
+			port: parseInt(process.env.DATABASE_PORT),
+			username: process.env.DATABASE_USERNAME,
+			password: process.env.DATABASE_PASSWORD,
+			database: process.env.DATABASE_NAME,
+			entities: [__dirname + '/**/*.entities{.ts,.js}'],
+			synchronize: true,
+			logging: true,
+			autoLoadEntities: true,
+			schema: 'public',
+		}),
 		MailerModule.forRoot({
 			transport: {
 				host: process.env.MAIL_HOST,
