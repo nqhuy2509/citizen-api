@@ -20,11 +20,14 @@ export class Profile {
 	@Column({ name: 'dob', type: 'date', nullable: true })
 	dob: Date;
 
-	@Column({ name: 'user_id', type: 'uuid' })
+	@Column({ name: 'user_id', type: 'uuid', nullable: true })
 	userId: string;
 
 	@Column({ name: 'citizen_id', type: 'varchar', length: 13 })
 	citizenId: string;
+
+	@Column({ name: 'national_id', type: 'varchar', length: 13 })
+	nationalId: string;
 
 	@CreateDateColumn({ name: 'created_at', type: 'timestamp' })
 	createdAt: Date;

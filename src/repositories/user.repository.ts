@@ -13,12 +13,19 @@ export class UserRepository {
 
 	async findUnique(email: string, citizenId: string): Promise<User> {
 		return this.userRepository.findOne({
-			where: {
-				email: email,
-				profile: {
-					citizenId: citizenId,
+			where: [
+				{ email: email },
+				{
+					profile: [
+						{
+							citizenId: citizenId,
+						},
+						{
+							nationalId: citizenId,
+						},
+					],
 				},
-			},
+			],
 			relations: ['profile'],
 		});
 	}
