@@ -38,7 +38,6 @@ export class User {
 	@UpdateDateColumn({ name: 'updated_at', type: 'timestamp' })
 	updatedAt: Date;
 
-	@OneToOne(() => Profile)
-	@JoinColumn()
+	@OneToOne(() => Profile, (profile) => profile.user)
 	profile: Profile;
 }

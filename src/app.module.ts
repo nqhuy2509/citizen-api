@@ -7,6 +7,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AdminModule } from './admin/admin.module';
+import { ProfileModule } from './profile/profile.module';
 
 @Module({
 	imports: [
@@ -46,6 +47,7 @@ import { AdminModule } from './admin/admin.module';
 		}),
 		UserModule,
 		AdminModule,
+		ProfileModule,
 	],
 	controllers: [AppController],
 	providers: [AppService],

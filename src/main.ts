@@ -8,7 +8,6 @@ async function bootstrap() {
 	});
 
 	app.enableCors();
-
 	app.setGlobalPrefix('api');
 	app.useGlobalPipes(new ValidationPipe());
 	await app.listen(process.env.PORT || 3000);

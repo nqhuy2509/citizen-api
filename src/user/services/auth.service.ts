@@ -9,9 +9,10 @@ import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { generateVerifyCode } from '../../utils';
 import { MailerService } from '@nestjs-modules/mailer';
-import { User } from '../../entities/user.entity';
 import { UserRepository } from '../../repositories/user.repository';
 import { StatusUser } from '../../enums/statusUser';
+import { User } from '../../entities/user.entity';
+import { ProfileRepository } from '../../repositories/profile.repository';
 
 type TokenResponse = {
 	email: string;
@@ -24,21 +25,43 @@ export class AuthService {
 		private readonly jwtService: JwtService,
 		private readonly mailerService: MailerService,
 		private readonly userRepository: UserRepository,
+		private readonly profileRepository: ProfileRepository,
 	) {}
 
 	async registerUser(dto: RegisterDto): Promise<User> {
-		const existUser = await this.userRepository.findUnique(
-			dto.email,
-			dto.citizenId,
-		);
+		const existUser = await this.userRepository.findByEmail(dto.email);
 
 		if (existUser) {
 			throw new BadRequestException('User already exists');
 		}
 
+		const existProfile = await this.profileRepository.findUnique(
+			dto.citizenId,
+		);
+
+		const userIsRegistered = await this.userRepository.findUserAlreadyExist(
+			existProfile.id,
+		);
+
+		if (userIsRegistered) {
+			throw new BadRequestException('This profile is already registered');
+		}
+
+		if (!existProfile) {
+			throw new BadRequestException('Profile not found');
+		}
+
 		dto.password = await bcrypt.hash(dto.password, 10);
 
 		const verifyCode = generateVerifyCode();
+
+		const user = new User();
+		user.email = dto.email;
+		user.password = dto.password;
+		user.verifyCode = verifyCode;
+		user.profile = existProfile;
+
+		const newUser = await this.userRepository.create(user);
 
 		await this.mailerService.sendMail({
 			to: dto.email,
@@ -49,12 +72,7 @@ export class AuthService {
 			},
 		});
 
-		const user = new User();
-		user.email = dto.email;
-		user.password = dto.password;
-		user.verifyCode = verifyCode;
-
-		return await this.userRepository.create(user);
+		return newUser;
 	}
 
 	async verifyUser(dto: VerifyDto): Promise<TokenResponse> {
