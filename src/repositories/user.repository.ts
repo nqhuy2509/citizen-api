@@ -30,6 +30,12 @@ export class UserRepository {
 		});
 	}
 
+	async findAllUser(): Promise<User[]> {
+		return this.userRepository.find({
+			relations: ['profile'],
+		});
+	}
+
 	async findUserAlreadyExist(id: string): Promise<User> {
 		return this.userRepository.findOne({
 			where: {

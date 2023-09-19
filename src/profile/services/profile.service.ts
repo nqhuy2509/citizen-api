@@ -3,6 +3,7 @@ import { ProfileRepository } from '../../repositories/profile.repository';
 import { CreateProfileDto } from '../dto/profile.dto';
 import { ApartmentRepository } from '../../repositories/apartment.repository';
 import { Profile } from '../../entities/profile.entity';
+import * as moment from 'moment';
 
 @Injectable()
 export class ProfileService {
@@ -46,11 +47,14 @@ export class ProfileService {
 		);
 
 		const profile = new Profile();
+
+		const formatDob = moment(dto.dob, 'DD/MM/YYYY').toDate();
+
 		profile.id = profileId;
 		profile.nationalId = dto.nationalId;
 		profile.firstName = dto.firstName;
 		profile.lastName = dto.lastName;
-		profile.dob = dto.dob;
+		profile.dob = formatDob;
 		profile.phoneNumber = dto.phoneNumber;
 		profile.apartment = existApartment;
 

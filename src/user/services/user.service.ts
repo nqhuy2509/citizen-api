@@ -9,11 +9,11 @@ export class UserService {
 		private readonly profileRepository: ProfileRepository,
 	) {}
 
-	async getAllUser(all: boolean) {
-		if (all) {
+	async getAllUser(query: any) {
+		if (query.all) {
 			return await this.profileRepository.getAllProfileUsers();
 		} else {
-			return;
+			return await this.userRepository.findAllUser();
 		}
 	}
 }

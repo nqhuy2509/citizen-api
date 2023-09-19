@@ -8,7 +8,7 @@ export class CreateProfileDto {
 	lastName: string;
 
 	@IsNotEmpty()
-	dob: Date;
+	dob: string;
 
 	@IsNotEmpty()
 	@MinLength(4)
