@@ -2,6 +2,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Injectable } from '@nestjs/common';
 import { Apartment } from '../entities/apartment.entity';
+import { StatusApartment } from '../utils/enum';
 
 @Injectable()
 export class ApartmentRepository {
@@ -23,8 +24,17 @@ export class ApartmentRepository {
 			.getOne();
 	}
 
-	async findAllApartment(): Promise<any> {
+	async findAll(): Promise<Apartment[]> {
 		return this.apartmentRepository.find({
+			relations: ['building', 'building.zone'],
+		});
+	}
+
+	async findManyByStatus(status: StatusApartment): Promise<Apartment[]> {
+		return this.apartmentRepository.find({
+			where: {
+				status: status,
+			},
 			relations: ['building', 'building.zone'],
 		});
 	}
