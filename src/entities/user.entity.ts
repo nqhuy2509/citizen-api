@@ -2,12 +2,11 @@ import {
 	Column,
 	CreateDateColumn,
 	Entity,
-	JoinColumn,
 	OneToOne,
 	PrimaryGeneratedColumn,
 	UpdateDateColumn,
 } from 'typeorm';
-import { StatusUser } from '../enums/statusUser';
+import { UserEnum } from '../utils/enum';
 import { Profile } from './profile.entity';
 
 @Entity({ name: 'users' })
@@ -25,12 +24,12 @@ export class User {
 	verifyCode: string;
 
 	@Column({
-		default: StatusUser.PENDING,
+		default: UserEnum.PENDING,
 		type: 'enum',
-		enum: StatusUser,
+		enum: UserEnum,
 		enumName: 'status',
 	})
-	status: StatusUser;
+	status: UserEnum;
 
 	@CreateDateColumn({ name: 'created_at', type: 'timestamp' })
 	createdAt: Date;

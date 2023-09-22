@@ -8,7 +8,7 @@ import { JwtService } from '@nestjs/jwt';
 import { AdminRepository } from '../repositories/admin.repository';
 import { LoginDto, RegisterDto } from './admin.dto';
 import { Admin } from '../entities/admin.entity';
-import { RoleAdmin } from '../enums/role.admin';
+import { RoleAdmin } from '../utils/enum';
 import * as bcrypt from 'bcrypt';
 
 type TokenResponse = {

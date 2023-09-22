@@ -1,6 +1,6 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { RoleAdmin } from '../enums/role.admin';
+import { RoleAdmin } from '../utils/enum';
 import { ROLE_KEY } from '../constants/string.constant';
 
 @Injectable()

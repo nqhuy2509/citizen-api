@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { StatusUser } from '../enums/statusUser';
+import { UserEnum } from '../utils/enum';
 import { User } from '../entities/user.entity';
 
 @Injectable()
@@ -58,7 +58,7 @@ export class UserRepository {
 		return this.userRepository.save(user);
 	}
 
-	async updateStatusUser(id: string, status: StatusUser) {
+	async updateStatusUser(id: string, status: UserEnum) {
 		return this.userRepository.update(id, { status: status });
 	}
 

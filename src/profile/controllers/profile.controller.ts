@@ -2,7 +2,7 @@ import { Body, Controller, HttpStatus, Post, UseGuards } from '@nestjs/common';
 import { AdminGuard } from '../../guards/admin.guard';
 import { RoleGuard } from '../../guards/role.guard';
 import { Roles } from '../../decorators/role.decorator';
-import { RoleAdmin } from '../../enums/role.admin';
+import { RoleAdmin } from '../../utils/enum';
 import { CreateProfileDto } from '../dto/profile.dto';
 import { ResponseCustom } from '../../utils/response';
 import { ProfileService } from '../services/profile.service';

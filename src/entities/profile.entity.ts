@@ -10,6 +10,7 @@ import {
 } from 'typeorm';
 import { Apartment } from './apartment.entity';
 import { User } from './user.entity';
+import { Gender } from '../utils/enum';
 
 @Entity({ name: 'profiles' })
 export class Profile {
@@ -24,6 +25,15 @@ export class Profile {
 
 	@Column({ name: 'dob', type: 'date', nullable: true })
 	dob: Date;
+
+	@Column({
+		name: 'gender',
+		type: 'enum',
+		default: Gender.OTHER,
+		enumName: 'gender',
+		enum: Gender,
+	})
+	gender: Gender;
 
 	@Column({ name: 'national_id', type: 'varchar', length: 13, unique: true })
 	nationalId: string;

@@ -10,7 +10,7 @@ import { JwtService } from '@nestjs/jwt';
 import { generateVerifyCode } from '../../utils';
 import { MailerService } from '@nestjs-modules/mailer';
 import { UserRepository } from '../../repositories/user.repository';
-import { StatusUser } from '../../enums/statusUser';
+import { UserEnum } from '../../utils/enum';
 import { User } from '../../entities/user.entity';
 import { ProfileRepository } from '../../repositories/profile.repository';
 
@@ -88,7 +88,7 @@ export class AuthService {
 
 		await this.userRepository.updateStatusUser(
 			existUser.id,
-			StatusUser.VERIFIED,
+			UserEnum.VERIFIED,
 		);
 
 		return await this.generateToken({
@@ -108,7 +108,7 @@ export class AuthService {
 			throw new BadRequestException('Invalid Credential');
 		}
 
-		if (user.status == StatusUser.PENDING) {
+		if (user.status == UserEnum.PENDING) {
 			throw new UnauthorizedException("User hasn't been verified yet");
 		}
 

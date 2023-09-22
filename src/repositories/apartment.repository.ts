@@ -22,4 +22,10 @@ export class ApartmentRepository {
 			.where('apartment.id = :id', { id: id })
 			.getOne();
 	}
+
+	async findAllApartment(): Promise<any> {
+		return this.apartmentRepository.find({
+			relations: ['building', 'building.zone'],
+		});
+	}
 }

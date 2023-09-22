@@ -8,6 +8,7 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AdminModule } from './admin/admin.module';
 import { ProfileModule } from './profile/profile.module';
+import { ApartmentModule } from './apartment/apartment.module';
 
 @Module({
 	imports: [
@@ -48,6 +49,7 @@ import { ProfileModule } from './profile/profile.module';
 		UserModule,
 		AdminModule,
 		ProfileModule,
+		ApartmentModule,
 	],
 	controllers: [AppController],
 	providers: [AppService],

@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { UserService } from '../services/user.service';
 import { Roles } from '../../decorators/role.decorator';
-import { RoleAdmin } from '../../enums/role.admin';
+import { RoleAdmin } from '../../utils/enum';
 import { RoleGuard } from '../../guards/role.guard';
 import { AdminGuard } from '../../guards/admin.guard';
 import { ResponseCustom } from '../../utils/response';
