@@ -10,7 +10,7 @@ export class Building {
 	@Column({ name: 'name', type: 'varchar', length: 255 })
 	name: string;
 
-	@Column({ name: 'num_of_floors', type: 'int' })
+	@Column({ name: 'num_of_floors', type: 'int', default: 0 })
 	numOfFloors: number;
 
 	@ManyToOne(() => Zone, (zone) => zone.buildings)
