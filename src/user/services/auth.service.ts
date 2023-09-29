@@ -32,23 +32,29 @@ export class AuthService {
 		const existUser = await this.userRepository.findByEmail(dto.email);
 
 		if (existUser) {
-			throw new BadRequestException('User already exists');
+			throw new BadRequestException({
+				code: 1001,
+				message: 'This email is already registered',
+			});
 		}
 
 		const existProfile = await this.profileRepository.findUnique(
 			dto.citizenId,
 		);
 
+		if (!existProfile) {
+			throw new NotFoundException('Your profile is not found');
+		}
+
 		const userIsRegistered = await this.userRepository.findUserAlreadyExist(
 			existProfile.id,
 		);
 
 		if (userIsRegistered) {
-			throw new BadRequestException('This profile is already registered');
-		}
-
-		if (!existProfile) {
-			throw new BadRequestException('Profile not found');
+			throw new BadRequestException({
+				code: 1002,
+				message: 'This profile is already registered',
+			});
 		}
 
 		dto.password = await bcrypt.hash(dto.password, 10);
