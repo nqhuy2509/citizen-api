@@ -1,6 +1,6 @@
 import { Body, Controller, HttpStatus, Post } from '@nestjs/common';
 import { AuthService } from '../services/auth.service';
-import { LoginDto, RegisterDto, VerifyDto } from '../dto/auth.dto';
+import { LoginDto, RegisterDto, ResendDto, VerifyDto } from '../dto/auth.dto';
 import { ResponseCustom } from 'src/utils/response';
 
 @Controller('auth')
@@ -33,5 +33,16 @@ export class AuthController {
 		const token = await this.authService.loginUser(dto);
 
 		return ResponseCustom(HttpStatus.OK, 'Login user successfully', token);
+	}
+
+	@Post('resend')
+	async resendVerifyCode(@Body() dto: ResendDto) {
+		await this.authService.resendVerifyCode(dto);
+
+		return ResponseCustom(
+			HttpStatus.OK,
+			'Resend verify code successfully',
+			null,
+		);
 	}
 }

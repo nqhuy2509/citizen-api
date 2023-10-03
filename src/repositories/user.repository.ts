@@ -62,6 +62,10 @@ export class UserRepository {
 		return this.userRepository.update(id, { status: status });
 	}
 
+	async updateVerifyCode(id: string, verifyCode: string) {
+		return this.userRepository.update(id, { verifyCode: verifyCode });
+	}
+
 	async getAllUser() {
 		return this.userRepository
 			.createQueryBuilder('user')

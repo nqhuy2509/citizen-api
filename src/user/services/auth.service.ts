@@ -4,7 +4,7 @@ import {
 	NotFoundException,
 	UnauthorizedException,
 } from '@nestjs/common';
-import { LoginDto, RegisterDto, VerifyDto } from '../dto/auth.dto';
+import { LoginDto, RegisterDto, ResendDto, VerifyDto } from '../dto/auth.dto';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { generateVerifyCode } from '../../utils';
@@ -102,6 +102,29 @@ export class AuthService {
 		});
 	}
 
+	async resendVerifyCode(dto: ResendDto): Promise<void> {
+		const existUser = await this.userRepository.findByEmail(dto.email);
+
+		if (!existUser) {
+			throw new NotFoundException('User not found');
+		}
+
+		const verifyCode = generateVerifyCode();
+
+		await this.userRepository.updateVerifyCode(existUser.id, verifyCode);
+
+		await this.mailerService.sendMail({
+			to: dto.email,
+			subject: 'Verify code to register',
+			template: './mail/register',
+			context: {
+				code: verifyCode,
+			},
+		});
+
+		return;
+	}
+
 	async loginUser(dto: LoginDto): Promise<TokenResponse> {
 		const user = await this.userRepository.findByEmail(dto.email);
 
@@ -111,11 +134,17 @@ export class AuthService {
 
 		const isMatch = await bcrypt.compare(dto.password, user.password);
 		if (!isMatch) {
-			throw new BadRequestException('Invalid Credential');
+			throw new UnauthorizedException({
+				code: 1003,
+				message: 'Invalid Credential',
+			});
 		}
 
 		if (user.status == UserEnum.PENDING) {
-			throw new UnauthorizedException("User hasn't been verified yet");
+			throw new UnauthorizedException({
+				code: 1004,
+				message: 'Your account is not verified',
+			});
 		}
 
 		return await this.generateToken({

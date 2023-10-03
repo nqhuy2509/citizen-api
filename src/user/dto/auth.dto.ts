@@ -20,6 +20,11 @@ export class VerifyDto {
 	code: string;
 }
 
+export class ResendDto {
+	@IsNotEmpty()
+	email: string;
+}
+
 export class LoginDto {
 	@IsNotEmpty()
 	email: string;
